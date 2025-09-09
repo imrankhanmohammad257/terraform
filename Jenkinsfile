@@ -25,14 +25,14 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                terraform plan()
+                sh 'terraform plan()'
             }
         }
 
         stage('Terraform Apply') {
             steps {
                 input(message: "Do you want to apply Terraform changes?") // manual approval
-                terraform apply()
+                sh 'terraform apply()'
             }
         }
     }
