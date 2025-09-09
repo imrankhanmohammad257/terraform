@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        terraform 'Terraform-1.13.1'   // The name you configured in Jenkins Tools
+        terraform 'Terraform'   // The name you configured in Jenkins Tools
     }
 
     environment {
