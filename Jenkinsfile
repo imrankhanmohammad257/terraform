@@ -1,29 +1,48 @@
 pipeline {
     agent any
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('Access_Key')
-        AWS_SECRET_ACCESS_KEY = credentials('Secret_key')
+
+    tools {
+        terraform 'Terraform-1.13.1'   // The name you configured in Jenkins Tools
     }
+
+    environment {
+        AWS_DEFAULT_REGION = "us-east-1"
+    }
+
     stages {
-        stage('Checkout Code') {
+        stage('Checkout SCM') {
             steps {
-                git url: 'https://github.com/imrankhanmohammad257/terraform.git', branch: 'main'
+                git branch: 'main',
+                    url: 'https://github.com/imrankhanmohammad257/terraform.git'
             }
         }
+
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                terraformInit()
             }
         }
+
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                terraformPlan()
             }
         }
+
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply --auto-approve'
+                input(message: "Do you want to apply Terraform changes?") // manual approval
+                terraformApply()
             }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Terraform pipeline executed successfully!"
+        }
+        failure {
+            echo "❌ Terraform pipeline failed!"
         }
     }
 }
