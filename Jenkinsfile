@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        terraform 'Terraform'   // The name you configured in Jenkins Tools
+        terraform 'Terraform-1.13.1'   // name from Manage Jenkins > Tools
     }
 
     environment {
@@ -19,20 +19,24 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init()'
+                script {
+                    def tfHome = tool name: 'Terraform-1.13.1', type: 'org.jenkinsci.plugins.terraform.TerraformInstallation'
+                    env.PATH = "${tfHome}:${env.PATH}"
+                }
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan()'
+                sh 'terraform plan -out=tfplan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                input(message: "Do you want to apply Terraform changes?") // manual approval
-                sh 'terraform apply()'
+                input message: "Do you want to apply Terraform changes?"
+                sh 'terraform apply -auto-approve tfplan'
             }
         }
     }
