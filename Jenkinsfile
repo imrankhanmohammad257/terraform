@@ -1,41 +1,37 @@
 pipeline {
     agent any
 
-    tools {
-        terraform 'Terraform-1.13.1'   // name from Manage Jenkins > Tools
-    }
-
-    environment {
-        AWS_DEFAULT_REGION = "us-east-1"
+    parameters {
+        string(name: 'FILENAME', defaultValue: 'animals.txt', description: 'Name of the file to create')
+        string(name: 'CONTENT', defaultValue: 'some animals are human friendly', description: 'Content of the file')
     }
 
     stages {
         stage('Checkout SCM') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/imrankhanmohammad257/terraform.git'
+                git branch: 'main', url: 'https://github.com/imrankhanmohammad257/terraform.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
-                script {
-                    def tfHome = tool name: 'Terraform-1.13.1', type: 'org.jenkinsci.plugins.terraform.TerraformInstallation'
-                    env.PATH = "${tfHome}:${env.PATH}"
-                }
                 sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan -out=tfplan'
+                sh """
+                terraform plan -out=tfplan \
+                  -var="filename=${params.FILENAME}" \
+                  -var="content=${params.CONTENT}"
+                """
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                input message: "Do you want to apply Terraform changes?"
+                input message: "⚠️ Do you want to apply Terraform changes?"
                 sh 'terraform apply -auto-approve tfplan'
             }
         }
@@ -43,7 +39,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Terraform pipeline executed successfully!"
+            echo "✅ Terraform executed successfully. File: ${params.FILENAME}"
         }
         failure {
             echo "❌ Terraform pipeline failed!"
