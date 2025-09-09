@@ -19,20 +19,20 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                terraformInit()
+                terraform init()
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                terraformPlan()
+                terraform plan()
             }
         }
 
         stage('Terraform Apply') {
             steps {
                 input(message: "Do you want to apply Terraform changes?") // manual approval
-                terraformApply()
+                terraform apply()
             }
         }
     }
