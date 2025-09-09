@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'FILENAME', defaultValue: 'animals.txt', description: 'Name of the file to create')
+        string(name: 'FILENAME', defaultValue: 'humans_animals.txt', description: 'Name of the file to create')
         string(name: 'CONTENT', defaultValue: 'some animals are human friendly', description: 'Content of the file')
     }
 
@@ -39,7 +39,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Terraform executed successfully. File: ${params.FILENAME}"
+            echo "✅ Terraform executed successfully. File: ${params.FILENAME} Content: ${params.CONTENT}"
         }
         failure {
             echo "❌ Terraform pipeline failed!"
